@@ -7,6 +7,7 @@
 #include <ESP8266mDNS.h>
 #include <NTPClient.h>
 #include <Adafruit_NeoPixel.h>
+#include "Webpages.h"
 
 ESP8266WebServer server(80);
 
@@ -32,8 +33,8 @@ IPAddress netmask(255, 255, 255, 0);
 
 const char *_ssid = "", *_pass = "";
 
-byte brillo = 250;   // Brillo de los leds via wifi
-byte brillo_2 = 250; // Brillo de los leds para indicador de hora
+byte brillo = 200;   // Brillo de los leds via wifi
+byte brillo_2 = 200; // Brillo de los leds para indicador de hora
 
 int proc_activo = 0;
 int max_hue = 65535;
@@ -61,25 +62,10 @@ String Head_1 = "<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"wi
 <a href=\"/setleds?r=255&g=255&b=0\"><input type=\"button\" style=\"background-color:#FFFF00;color:white;width:20px; height:20px\"></a>\
 <a href=\"/setleds?r=255&g=153&b=51\"><input type=\"button\" style=\"background-color:#FF9933;color:white;width:20px; height:20px\"></a></p>\
 <form action=\"/setbrightness\"><p><label for=\"brillo\">Brillo:</label>\
-<input type=\"range\" id=\"brillo\" name=\"br\" min=\"0\" max=\"255\" value=\"";
+<input type=\"range\" id=\"brillo\" name=\"br\" min=\"0\" max=\"200\" value=\"";
 
 String Head_2 = "\"><input type=\"submit\" value=\"Enviar\"></p></form>\
 <p><a href=\"/ledsoff\"><button id=\"button1\" class=\"button\">Apagar</button></a></p>";
-
-String ConfigPage_1 = "<!DOCTYPE html><html><head></head><body><center><h1>Configuracion de red</h1></center><form><fieldset><div><label for=\"ssid\">SSID</label>\
-<input value=\"\" id=\"ssid\" placeholder=\"SSID\"></div><div><label for=\"password\">PASSWORD</label>\
-<input value=\"\" id=\"password\" placeholder=\"PASSWORD\"></div><div>\
-<button class=\"primary\" id=\"savebtn\" type=\"button\" onclick=\"myFunction()\">SAVE</button></div>\
-</fieldset></form></body><script>function myFunction(){console.log(\"button was clicked!\");\
-var ssid = document.getElementById(\"ssid\").value;\
-var password = document.getElementById(\"password\").value;\
-var data = {ssid:ssid, password:password};\
-var xhr = new XMLHttpRequest();var url = \"/settings\";\
-xhr.onreadystatechange = function() {if (this.readyState == 4 && this.status == 200) {\
-if(xhr.responseText != null){console.log(xhr.responseText);}}};\
-xhr.open(\"POST\", url, true);xhr.send(JSON.stringify(data));};</script><h2><center>\"";
-
-String IP_Show_html = "\"</h2></center></html>";
 
 // ***** FUNCIONES *****
 void ConfigLocal();
@@ -101,6 +87,8 @@ void on_off();
 void led_hora();
 void avisa_hora();
 void avisa_leds();
+void read_ip_web();
+
 // ***** FUNCIONES *****
 
 void setup()
@@ -114,22 +102,26 @@ void setup()
   //  WiFi.softAP(AP_SSID,AP_PASS);
   WiFi.softAP(AP_SSID);
 
+  Serial.println("Paso 1");
+
   //  Serial.println("Formatting LittleFS filesystem");
   //  LittleFS.format();
-  Serial.println("Mount LittleFS");
+  //Serial.println("Mount LittleFS");
   if (!LittleFS.begin())
   {
     Serial.println("LittleFS mount failed");
     return;
   }
   delay(5000);
+  Serial.println("Paso 2");
 
   //Cargar credenciales desde archivo
   Cargar_Credenciales();
+  Serial.println("Paso 3");
 
   // Begin WiFi
   WiFi.begin(_ssid, _pass);
-  WiFi.begin();
+  //WiFi.begin();
   if (WiFi.status() == WL_CONNECTED)
   {
     IP_Show = WiFi.localIP().toString().c_str();
@@ -157,6 +149,7 @@ void setup()
   //    delay(100);
   //    Serial.print(".");
   //  }
+  Serial.println("Paso 4");
 
   // Connected to WiFi
   Serial.print("Listo! IP address: ");
@@ -167,37 +160,38 @@ void setup()
   Serial.println(WiFi.getMode());
 
   server.on("/", Inicio);
-  server.on("/config_red", ConfigLocal);
+  server.on("/configurar", ConfigLocal);
   server.on("/settings", HTTP_POST, handleSettingsUpdate);
+  server.on("/loadip", read_ip_web);
 
   server.on("/rainbow", []() {
     Arco_page();
     proc_activo = 1;
-    print_proc(proc_activo);
+    // print_proc(proc_activo);
   });
 
   server.on("/wave", []() {
     Wave_page();
     proc_activo = 2;
-    print_proc(proc_activo);
+    // print_proc(proc_activo);
   });
 
   server.on("/on_off_fast", []() {
     Onoff_page();
     proc_activo = 3;
-    print_proc(proc_activo);
+    // print_proc(proc_activo);
   });
 
   server.on("/setleds", []() {
     Color_page();
     proc_activo = 4;
-    print_proc(proc_activo);
-    Serial.println("-----------");
-    Serial.print(server.arg(0).toInt());
-    Serial.print(" ");
-    Serial.print(server.arg(1).toInt());
-    Serial.print(" ");
-    Serial.println(server.arg(2).toInt());
+    // print_proc(proc_activo);
+    // Serial.println("-----------");
+    // Serial.print(server.arg(0).toInt());
+    // Serial.print(" ");
+    // Serial.print(server.arg(1).toInt());
+    // Serial.print(" ");
+    // Serial.println(server.arg(2).toInt());
     uint32_t nuevo_color = strip.Color(server.arg(0).toInt(), server.arg(1).toInt(), server.arg(2).toInt());
     strip.setBrightness(brillo);
     strip.fill(nuevo_color);
@@ -214,7 +208,7 @@ void setup()
   server.on("/ledsoff", []() {
     Off_page();
     proc_activo = 0;
-    print_proc(proc_activo);
+    //print_proc(proc_activo);
     strip.fill(strip.Color(0, 0, 0));
     strip.show();
   });
@@ -223,7 +217,7 @@ void setup()
 
   server.begin();
 
-  Serial.println("HTTP Server iniciado");
+  //Serial.println("HTTP Server iniciado");
 
   strip.begin();
   for (int i = 0; i < 20; i++)
@@ -234,6 +228,8 @@ void setup()
   delay(2000);
   strip.fill(strip.Color(0, 0, 0));
   strip.show();
+
+  Serial.println("Paso 5");
 }
 
 void loop()
@@ -261,21 +257,22 @@ void loop()
 
 void ConfigLocal()
 {
-  Serial.println("Entraron a Config");
-  Cargar_Credenciales();
-  String IP_Show_1, IP_Show_2;
-  IP_Show_1 = "El IP asignado por su network es: ";
-  IP_Show_2 = "<p>La red y password que se estan usando son: " + Red_String + " / " + Password_String + "</p>";
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    IP_Show = WiFi.localIP().toString().c_str();
-  }
-  else
-  {
-    IP_Show = "IP NO ASIGNADO";
-  }
-  String message = ConfigPage_1 + IP_Show_1 + IP_Show + IP_Show_2 + IP_Show_html;
-  server.send(200, "text/html", message);
+  server.send_P(200, "text/html", Configpage_1);
+  // Serial.println("Entraron a Config");
+  // Cargar_Credenciales();
+  // String IP_Show_1, IP_Show_2;
+  // IP_Show_1 = "El IP asignado por su network es: ";
+  // IP_Show_2 = "<p>La red y password que se estan usando son: " + Red_String + " / " + Password_String + "</p>";
+  // if (WiFi.status() == WL_CONNECTED)
+  // {
+  //   IP_Show = WiFi.localIP().toString().c_str();
+  // }
+  // else
+  // {
+  //   IP_Show = "IP NO ASIGNADO";
+  // }
+  // String message = ConfigPage_1 + IP_Show_1 + IP_Show + IP_Show_2 + IP_Show_html;
+  // server.send(200, "text/html", message);
 }
 
 void handleSettingsUpdate()
@@ -399,12 +396,35 @@ void Off_page()
   server.send(200, "text/html", message);
 }
 
+void read_ip_web()
+{
+  String web_1, web_2, web_3, web_4;
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    web_1 = WiFi.localIP().toString().c_str();
+  }
+  else
+  {
+    web_1 = "IP NO ASIGNADO";
+  }
+  web_2 = String(_ssid);
+  web_3 = String(_pass);
+  web_4 = web_1 + "***" + Red_String + "***" + Password_String;
+  Serial.print("Datos:");
+
+  Serial.println(web_4);
+  Serial.println(Red_String);
+  Serial.println(Password_String);
+
+  server.send(200, "text/plain", web_4);
+}
+
 //*****FUNCIONES DE LUCES CONTROL*****
 void print_proc(int a)
 {
-  Serial.println("----------------");
-  Serial.print("Proceso activo: ");
-  Serial.println(a);
+  // Serial.println("----------------");
+  // Serial.print("Proceso activo: ");
+  // Serial.println(a);
 }
 
 void arcoiris()
@@ -468,7 +488,7 @@ void led_hora()
 // De lunes a viernes de 6am a 8am y de 6pm a 9pm
 void avisa_hora()
 {
-  print_proc(proc_activo);
+  //print_proc(proc_activo);
   //  Serial.print("Tiempo: ");
   //  Serial.print(timeClient.getHours());
   //  Serial.print(":");
