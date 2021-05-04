@@ -7,7 +7,8 @@
 #include <ESP8266mDNS.h>
 #include <NTPClient.h>
 #include <Adafruit_NeoPixel.h>
-#include "Webpages.h"
+#include "Config_page.h"
+#include "Main_page.h"
 
 ESP8266WebServer server(80);
 
@@ -43,29 +44,6 @@ int grupo = max_hue / (strip.numPixels() * segmentos);
 int activo = 0;
 
 String IP_Show, Red_String, Password_String;
-
-String Head_1 = "<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\
-<link rel=\"icon\" href=\"data:,\"><style>#button1{width: 100px;height: 40px;}</style>\
-<title> Ledstival</title></head><body><center><h1>Control de luces Wifi</h1>\
-<p><a href=\"/rainbow\"><button id=\"button1\" class=\"button\">Arcoiris</button></a>\
-<a href=\"/wave?r=255&g=32&b=10\"><button id=\"button1\" class=\"button\">Movimiento</button></a>\
-<a href=\"/on_off_fast\"><button id=\"button1\" class=\"button\">On Off</button></a></p>\
-<p><a href=\"/setleds?r=255&g=255&b=255\"><input type=\"button\" style=\"background-color:#FFFFFF;color:white;width:20px; height:20px\"></a>\
-<a href=\"/setleds?r=255&g=0&b=0\"><input type=\"button\" style=\"background-color:#FF0000;color:white;width:20px; height:20px\"></a>\
-<a href=\"/setleds?r=153&g=0&b=153\"><input type=\"button\" style=\"background-color:#990099;color:white;width:20px; height:20px\"></a>\
-<a href=\"/setleds?r=204&g=0&b=204\"><input type=\"button\" style=\"background-color:#CC00CC;color:white;width:20px; height:20px\"></a>\
-<a href=\"/setleds?r=51&g=51&b=204\"><input type=\"button\" style=\"background-color:#3333CC;color:white;width:20px; height:20px\"></a>\
-<a href=\"/setleds?r=0&g=102&b=102\"><input type=\"button\" style=\"background-color:#006666;color:white;width:20px; height:20px\"></a>\
-</p><p><a href=\"/setleds?r=0&g=204&b=255\"><input type=\"button\" style=\"background-color:#00CCFF;color:white;width:20px; height:20px\"></a>\
-<a href=\"/setleds?r=0&g=204&b=0\"><input type=\"button\" style=\"background-color:#00CC00;color:white;width:20px; height:20px\"></a>\
-<a href=\"/setleds?r=102&g=153&b=0\"><input type=\"button\" style=\"background-color:#669900;color:white;width:20px; height:20px\"></a>\
-<a href=\"/setleds?r=255&g=255&b=0\"><input type=\"button\" style=\"background-color:#FFFF00;color:white;width:20px; height:20px\"></a>\
-<a href=\"/setleds?r=255&g=153&b=51\"><input type=\"button\" style=\"background-color:#FF9933;color:white;width:20px; height:20px\"></a></p>\
-<form action=\"/setbrightness\"><p><label for=\"brillo\">Brillo:</label>\
-<input type=\"range\" id=\"brillo\" name=\"br\" min=\"0\" max=\"200\" value=\"";
-
-String Head_2 = "\"><input type=\"submit\" value=\"Enviar\"></p></form>\
-<p><a href=\"/ledsoff\"><button id=\"button1\" class=\"button\">Apagar</button></a></p>";
 
 // ***** FUNCIONES *****
 void ConfigLocal();
@@ -350,8 +328,7 @@ void handleNotFound()
 //*****FUNCIONES DE LUCES SERVER*****
 void Inicio()
 {
-  String message = Head(brillo) + "</center></body></html>";
-  server.send(200, "text/html", message);
+  server.send_P(200, "text/html", Mainpage_1);
 }
 
 String Head(int br)
@@ -362,37 +339,37 @@ String Head(int br)
 
 void Arco_page()
 {
-  String message = Head(brillo) + "<h2>Arcoiris Activo</h2></center></body></html>";
+  String message = "Arcoiris Activo";
   server.send(200, "text/html", message);
 }
 
 void Wave_page()
 {
-  String message = Head(brillo) + "<h2>Movimiento Activo</h2></center></body></html>";
+  String message = "Movimiento Activo";
   server.send(200, "text/html", message);
 }
 
 void Onoff_page()
 {
-  String message = Head(brillo) + "<h2>On Off Activo</h2></center></body></html>";
+  String message = "On Off Activo";
   server.send(200, "text/html", message);
 }
 
 void Color_page()
 {
-  String message = Head(brillo) + "<h2>Color fijo</h2></center></body></html>";
+  String message = "Color fijo";
   server.send(200, "text/html", message);
 }
 
 void Brillo_page()
 {
-  String message = Head(brillo) + "<h2>Brillo ajustado</h2></center></body></html>";
+  String message = "Brillo ajustado";
   server.send(200, "text/html", message);
 }
 
 void Off_page()
 {
-  String message = Head(brillo) + "<h2>Leds Apagados</h2></center></body></html>";
+  String message = "Leds Apagados";
   server.send(200, "text/html", message);
 }
 
