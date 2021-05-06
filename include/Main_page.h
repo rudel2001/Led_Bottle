@@ -19,6 +19,7 @@ const char Mainpage_1[] PROGMEM = R"=====(
       <p>
         <button
           type="button"
+          style="background-color: #e7e7e3; color: black"
           id="button1"
           class="button"
           onclick="MyFunction('/rainbow')"
@@ -28,6 +29,7 @@ const char Mainpage_1[] PROGMEM = R"=====(
 
         <button
           type="button"
+          style="background-color: #e7e7e3; color: black"
           id="button1"
           class="button"
           onclick="MyFunction('/wave?r=255&g=32&b=10')"
@@ -36,6 +38,7 @@ const char Mainpage_1[] PROGMEM = R"=====(
         </button>
         <button
           type="button"
+          style="background-color: #e7e7e3; color: black"
           id="button1"
           class="button"
           onclick="MyFunction('/on_off_fast')"
@@ -159,22 +162,38 @@ const char Mainpage_1[] PROGMEM = R"=====(
         ></button>
       </p>
 
-      <form action="/setbrightness">
+      <!-- <form action="/setbrightness"> -->
+      <form onsubmit="return setBright()">
         <p>
           <label for="brillo">Brillo:</label>
           <input
             type="range"
             id="brillo"
             name="br"
-            min="0"
+            min="5"
             max="200"
             value=""
-          /><input type="submit" value="Enviar" />
+          />
+          <button
+            type="button"
+            style="
+              background-color: #e7e7e3;
+              color: black;
+              width: 70px;
+              height: 30px;
+            "
+            id="btn_br"
+            class="button"
+            onclick="setBright()"
+          >
+            Enviar
+          </button>
         </p>
       </form>
       <p>
         <button
           type="button"
+          style="background-color: #e7e7e3; color: black"
           id="button1"
           class="button"
           onclick="MyFunction('/ledsoff')"
@@ -187,18 +206,49 @@ const char Mainpage_1[] PROGMEM = R"=====(
   </body>
   <script>
     function MyFunction(url) {
-      console.log("Se recibió la data de IP");
+      console.log("Se envia color o patron");
       var xhr = new XMLHttpRequest();
 
       xhr.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-          mensaje = this.responseText.split("***");
+          mensaje = this.responseText;
           document.getElementById("msg_estatus").innerHTML = mensaje;
         }
       };
       xhr.open("GET", url, true);
       xhr.send();
     }
+    function setBright() {
+      console.log("Se ejecuta rutina de setear brillo");
+      var xhr = new XMLHttpRequest();
+      var brillo = document.getElementById("brillo").value;
+      var prefijo = document.getElementById("brillo").name;
+      var url = "/setbrightness?br=" + brillo;
+      console.log(url);
+      xhr.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          mensaje = this.responseText;
+          document.getElementById("msg_estatus").innerHTML = mensaje;
+        }
+      };
+      xhr.open("GET", url, true);
+      xhr.send();
+    }
+    function F_Lee_Brillo() {
+      console.log("Se recibio la data de brillo del D1");
+      var xhr = new XMLHttpRequest();
+      var url = "/leebrillo";
+
+      xhr.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          mensaje = this.responseText;
+          document.getElementById("brillo").value = mensaje;
+        }
+      };
+      xhr.open("GET", url, true);
+      xhr.send();
+    }
+    document.addEventListener("DOMContentLoaded", F_Lee_Brillo, false);
   </script>
 </html>
 )=====";

@@ -34,7 +34,7 @@ IPAddress netmask(255, 255, 255, 0);
 
 const char *_ssid = "", *_pass = "";
 
-byte brillo = 200;   // Brillo de los leds via wifi
+byte brillo = 150;   // Brillo de los leds via wifi
 byte brillo_2 = 200; // Brillo de los leds para indicador de hora
 
 int proc_activo = 0;
@@ -51,7 +51,6 @@ void handleSettingsUpdate();
 void Cargar_Credenciales();
 void handleNotFound();
 void Inicio();
-String Head(int br);
 void Arco_page();
 void Wave_page();
 void Onoff_page();
@@ -178,9 +177,19 @@ void setup()
 
   server.on("/setbrightness", []() {
     brillo = server.arg(0).toInt();
+    Serial.print("Brillo recibido:");
+    Serial.println(brillo);
+    
     Brillo_page();
     strip.setBrightness(brillo);
     strip.show();
+  });
+
+  server.on("/leebrillo", []() {
+    Serial.print("Brillo enviado:");
+    Serial.println(brillo);
+
+    server.send(200, "text/html", String(brillo));
   });
 
   server.on("/ledsoff", []() {
@@ -329,12 +338,6 @@ void handleNotFound()
 void Inicio()
 {
   server.send_P(200, "text/html", Mainpage_1);
-}
-
-String Head(int br)
-{
-  String constructor = Head_1 + String(br) + Head_2;
-  return constructor;
 }
 
 void Arco_page()
