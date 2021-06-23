@@ -20,12 +20,12 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pa.pool.ntp.org", -18000, 86400000);
 
 const int LED_PIN = D1;
-const int LED_COUNT = 21;
+const int LED_COUNT = 37;
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 // Set AP credentials
-#define AP_SSID "PASATIEMPO_J1"
+#define AP_SSID "PASATIEMPO_J2"
 #define AP_PASS "123"
 
 IPAddress local_ip(192, 168, 11, 111);
@@ -34,7 +34,7 @@ IPAddress netmask(255, 255, 255, 0);
 
 const char *_ssid = "", *_pass = "";
 
-byte brillo = 150;   // Brillo de los leds via wifi
+byte brillo_1 = 150; // Brillo de los leds via wifi
 byte brillo_2 = 200; // Brillo de los leds para indicador de hora
 
 int proc_activo = 0;
@@ -61,7 +61,7 @@ void print_proc(int a);
 void arcoiris();
 void patron(unsigned int ciclos);
 void on_off();
-void led_hora();
+void led_hora(byte brillo);
 void avisa_hora();
 void avisa_leds();
 void read_ip_web();
@@ -141,64 +141,71 @@ void setup()
   server.on("/settings", HTTP_POST, handleSettingsUpdate);
   server.on("/loadip", read_ip_web);
 
-  server.on("/rainbow", []() {
-    Arco_page();
-    proc_activo = 1;
-    // print_proc(proc_activo);
-  });
+  server.on("/rainbow", []()
+            {
+              Arco_page();
+              proc_activo = 1;
+              // print_proc(proc_activo);
+            });
 
-  server.on("/wave", []() {
-    Wave_page();
-    proc_activo = 2;
-    // print_proc(proc_activo);
-  });
+  server.on("/wave", []()
+            {
+              Wave_page();
+              proc_activo = 2;
+              // print_proc(proc_activo);
+            });
 
-  server.on("/on_off_fast", []() {
-    Onoff_page();
-    proc_activo = 3;
-    // print_proc(proc_activo);
-  });
+  server.on("/on_off_fast", []()
+            {
+              Onoff_page();
+              proc_activo = 3;
+              // print_proc(proc_activo);
+            });
 
-  server.on("/setleds", []() {
-    Color_page();
-    proc_activo = 4;
-    // print_proc(proc_activo);
-    // Serial.println("-----------");
-    // Serial.print(server.arg(0).toInt());
-    // Serial.print(" ");
-    // Serial.print(server.arg(1).toInt());
-    // Serial.print(" ");
-    // Serial.println(server.arg(2).toInt());
-    uint32_t nuevo_color = strip.Color(server.arg(0).toInt(), server.arg(1).toInt(), server.arg(2).toInt());
-    strip.setBrightness(brillo);
-    strip.fill(nuevo_color);
-    strip.show();
-  });
+  server.on("/setleds", []()
+            {
+              Color_page();
+              proc_activo = 4;
+              // print_proc(proc_activo);
+              // Serial.println("-----------");
+              // Serial.print(server.arg(0).toInt());
+              // Serial.print(" ");
+              // Serial.print(server.arg(1).toInt());
+              // Serial.print(" ");
+              // Serial.println(server.arg(2).toInt());
+              uint32_t nuevo_color = strip.Color(server.arg(0).toInt(), server.arg(1).toInt(), server.arg(2).toInt());
+              strip.setBrightness(brillo_1);
+              strip.fill(nuevo_color);
+              strip.show();
+            });
 
-  server.on("/setbrightness", []() {
-    brillo = server.arg(0).toInt();
-    Serial.print("Brillo recibido:");
-    Serial.println(brillo);
-    
-    Brillo_page();
-    strip.setBrightness(brillo);
-    strip.show();
-  });
+  server.on("/setbrightness", []()
+            {
+              brillo_1 = server.arg(0).toInt();
+              Serial.print("brillo_1 recibido:");
+              Serial.println(brillo_1);
 
-  server.on("/leebrillo", []() {
-    Serial.print("Brillo enviado:");
-    Serial.println(brillo);
+              Brillo_page();
+              strip.setBrightness(brillo_1);
+              strip.show();
+            });
 
-    server.send(200, "text/html", String(brillo));
-  });
+  server.on("/leebrillo", []()
+            {
+              Serial.print("Brillo enviado:");
+              Serial.println(brillo_1);
 
-  server.on("/ledsoff", []() {
-    Off_page();
-    proc_activo = 0;
-    //print_proc(proc_activo);
-    strip.fill(strip.Color(0, 0, 0));
-    strip.show();
-  });
+              server.send(200, "text/html", String(brillo_1));
+            });
+
+  server.on("/ledsoff", []()
+            {
+              Off_page();
+              proc_activo = 0;
+              //print_proc(proc_activo);
+              strip.fill(strip.Color(0, 0, 0));
+              strip.show();
+            });
 
   server.onNotFound(handleNotFound);
 
@@ -221,23 +228,26 @@ void setup()
 
 void loop()
 {
+  // Maneja cliente WEB
   server.handleClient();
 
   // Actualiza hora
   timeClient.update();
 
-  if (proc_activo == 1)
+  // Instrucciones WEB
+  switch (proc_activo)
   {
+  case 1:
     arcoiris();
-  }
-  if (proc_activo == 2)
-  {
+    break;
+  case 2:
     patron(1);
-  }
-  if (proc_activo == 3)
-  {
+    break;
+  case 3:
     on_off();
+    break;
   }
+
   // Revisamos si se debe encender el indicador de hora
   avisa_hora();
 }
@@ -412,7 +422,7 @@ void arcoiris()
   for (int i = 0; i < strip.numPixels(); i++)
   {
     int color_led = activo + grupo * i;
-    int color = strip.gamma32(strip.ColorHSV(color_led, 150, brillo));
+    int color = strip.gamma32(strip.ColorHSV(color_led, 150, brillo_1));
     strip.setPixelColor(i, color);
   }
   strip.show();
@@ -428,7 +438,7 @@ void patron(unsigned int ciclos)
     for (int a = 0; a < strip.numPixels(); a += 1)
     {
       hue_val = random(0, 65535);
-      color = strip.gamma32(strip.ColorHSV(hue_val, 150, brillo));
+      color = strip.gamma32(strip.ColorHSV(hue_val, 150, brillo_1));
       strip.setPixelColor(a, color);
     }
     strip.show();
@@ -447,7 +457,7 @@ void on_off()
   delay(200);
 }
 
-void led_hora()
+void led_hora(byte brillo)
 {
   int color, hue_val;
   for (unsigned int j = 0; j < 1; j++)
@@ -455,7 +465,7 @@ void led_hora()
     for (int a = 0; a < strip.numPixels(); a++)
     {
       hue_val = random(0, 65535);
-      color = strip.gamma32(strip.ColorHSV(hue_val, 150, brillo_2));
+      color = strip.gamma32(strip.ColorHSV(hue_val, 150, brillo));
       strip.setPixelColor(a, color);
     }
     strip.show();
@@ -475,20 +485,20 @@ void avisa_hora()
   //  Serial.print(timeClient.getMinutes());
   //  Serial.print(":");
   //  Serial.println(timeClient.getSeconds());
-  if (proc_activo == 0 or proc_activo == 100)
+  if ((proc_activo == 0) || (proc_activo == 100))
   {
-    if (timeClient.getHours() >= 5 and timeClient.getHours() <= 23 and timeClient.getMinutes() == 0)
+    if ((timeClient.getHours() >= 5) && (timeClient.getHours() <= 23) && (timeClient.getMinutes() == 0))
     {
-      //    if(timeClient.getHours() >= 5 and timeClient.getHours() <= 23){
+      //    if(timeClient.getHours() >= 5 && timeClient.getHours() <= 23){
       if (timeClient.getSeconds() <= 15)
       {
         proc_activo = 100; // Se asigna proc_activo = 100 para utilizar la misma variable
-        led_hora();
+        led_hora(brillo_2);
         delay(100);
       }
       else
       {
-        if (timeClient.getSeconds() > 15 and timeClient.getSeconds() <= 18)
+        if ((timeClient.getSeconds() > 15) && (timeClient.getSeconds() <= 18))
         {
           proc_activo = 0;
           strip.clear();
@@ -501,7 +511,7 @@ void avisa_hora()
 
 void avisa_leds()
 {
-  for (int a = 0; a < 3; a++)
+  for (int a = 0; a < 8; a++)
   {
     strip.fill(strip.Color(0, 255, 0));
     strip.show();

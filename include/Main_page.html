@@ -4,6 +4,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="data:," />
     <style>
+      body {
+        font-family: "Arial";
+        text-align: center;
+        background: rgba(243, 174, 157, 0.3);
+      }
+      .b1 {
+        background-color: #eee7e5cb;
+        color: black;
+      }
+      .b2 {
+        width: 20px;
+        height: 20px;
+        color: white;
+      }
       #button1 {
         width: 100px;
         height: 40px;
@@ -18,9 +32,8 @@
       <p>
         <button
           type="button"
-          style="background-color: #e7e7e3; color: black"
           id="button1"
-          class="button"
+          class="b1"
           onclick="MyFunction('/rainbow')"
         >
           Arcoiris
@@ -28,18 +41,16 @@
 
         <button
           type="button"
-          style="background-color: #e7e7e3; color: black"
           id="button1"
-          class="button"
+          class="b1"
           onclick="MyFunction('/wave?r=255&g=32&b=10')"
         >
           Movimiento
         </button>
         <button
           type="button"
-          style="background-color: #e7e7e3; color: black"
           id="button1"
-          class="button"
+          class="b1"
           onclick="MyFunction('/on_off_fast')"
         >
           On Off
@@ -48,62 +59,38 @@
       <p>
         <button
           type="button"
-          style="
-            background-color: #ffffff;
-            color: white;
-            width: 20px;
-            height: 20px;
-          "
+          class="b2"
+          style="background-color: #ffffff"
           onclick="MyFunction('/setleds?r=255&g=255&b=255')"
         ></button>
         <button
           type="button"
-          style="
-            background-color: #ff0000;
-            color: white;
-            width: 20px;
-            height: 20px;
-          "
+          class="b2"
+          style="background-color: #ff0000"
           onclick="MyFunction('/setleds?r=255&g=0&b=0')"
         ></button>
         <button
           type="button"
-          style="
-            background-color: #990099;
-            color: white;
-            width: 20px;
-            height: 20px;
-          "
+          class="b2"
+          style="background-color: #990099"
           onclick="MyFunction('/setleds?r=153&g=0&b=153')"
         ></button>
         <button
           type="button"
-          style="
-            background-color: #cc00cc;
-            color: white;
-            width: 20px;
-            height: 20px;
-          "
+          class="b2"
+          style="background-color: #cc00cc"
           onclick="MyFunction('/setleds?r=204&g=0&b=204')"
         ></button>
         <button
           type="button"
-          style="
-            background-color: #3333cc;
-            color: white;
-            width: 20px;
-            height: 20px;
-          "
+          class="b2"
+          style="background-color: #3333cc"
           onclick="MyFunction('/setleds?r=51&g=51&b=204')"
         ></button>
         <button
           type="button"
-          style="
-            background-color: #006666;
-            color: white;
-            width: 20px;
-            height: 20px;
-          "
+          class="b2"
+          style="background-color: #006666"
           onclick="MyFunction('/setleds?r=0&g=102&b=102')"
         ></button>
       </p>
@@ -111,52 +98,32 @@
       <p>
         <button
           type="button"
-          style="
-            background-color: #00ccff;
-            color: white;
-            width: 20px;
-            height: 20px;
-          "
+          class="b2"
+          style="background-color: #00ccff"
           onclick="MyFunction('/setleds?r=0&g=204&b=255')"
         ></button>
         <button
           type="button"
-          style="
-            background-color: #00cc00;
-            color: white;
-            width: 20px;
-            height: 20px;
-          "
+          class="b2"
+          style="background-color: #00cc00"
           onclick="MyFunction('/setleds?r=0&g=204&b=0')"
         ></button>
         <button
           type="button"
-          style="
-            background-color: #669900;
-            color: white;
-            width: 20px;
-            height: 20px;
-          "
+          class="b2"
+          style="background-color: #669900"
           onclick="MyFunction('/setleds?r=102&g=153&b=0')"
         ></button>
         <button
           type="button"
-          style="
-            background-color: #ffff00;
-            color: white;
-            width: 20px;
-            height: 20px;
-          "
+          class="b2"
+          style="background-color: #ffff00"
           onclick="MyFunction('/setleds?r=255&g=255&b=0')"
         ></button>
         <button
           type="button"
-          style="
-            background-color: #ff9933;
-            color: white;
-            width: 20px;
-            height: 20px;
-          "
+          class="b2"
+          style="background-color: #ff9933"
           onclick="MyFunction('/setleds?r=255&g=153&b=51')"
         ></button>
       </p>
@@ -175,12 +142,8 @@
           />
           <button
             type="button"
-            style="
-              background-color: #e7e7e3;
-              color: black;
-              width: 70px;
-              height: 30px;
-            "
+            class="b1"
+            style="width: 70px; height: 30px"
             id="btn_br"
             class="button"
             onclick="setBright()"
@@ -192,9 +155,8 @@
       <p>
         <button
           type="button"
-          style="background-color: #e7e7e3; color: black"
           id="button1"
-          class="button"
+          class="b1"
           onclick="MyFunction('/ledsoff')"
         >
           Apagar

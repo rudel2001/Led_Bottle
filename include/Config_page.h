@@ -4,13 +4,11 @@ const char Configpage_1[] PROGMEM = R"=====(
   <head>
     <meta charset="UTF-8" />
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Balsamiq+Sans&display=swap");
       body {
-        font-family: "Balsamiq Sans", cursive;
+        font-family: "Arial";
         text-align: center;
-        background: rgba(176, 165, 235, 0.3);
+        background: rgba(243, 174, 157, 0.3);
       }
-      @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap");
       table {
         border-spacing: 15px;
       }
@@ -20,13 +18,12 @@ const char Configpage_1[] PROGMEM = R"=====(
       }
       input {
         border-radius: 9px;
-        background: rgb(237, 237, 237);
+        background: rgb(228, 209, 209);
         font-size: 16px;
       }
       button {
         width: 200px;
         height: 40px;
-        font-family: "Roboto", sans-serif;
         margin: 0px 10px;
         border-radius: 100px;
         font-size: 16px;
@@ -78,7 +75,7 @@ const char Configpage_1[] PROGMEM = R"=====(
       var xhr = new XMLHttpRequest();
       var url = "/settings";
       var mensaje_boton =
-        "Cierre esta página, apague la botella, vuelva a encenderla, espere 1 minuto, conectese a la red PASATIEMPO_?? y vuelva a entrar a la configuración para leer datos actualizados";
+        "Cierre esta página, apague la botella, vuelva a encenderla, espere 1 minuto, conectese a la red PASATIEMPO_J2 y vuelva a entrar a la configuración para leer datos actualizados";
       xhr.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
           if (xhr.responseText != null) {

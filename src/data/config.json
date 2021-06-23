@@ -1,4 +1,4 @@
 {
-  ssid:ABC,
-  password:123456
+  "ssid":"ABC",
+  "password":"123456"
 }
